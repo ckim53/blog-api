@@ -1,0 +1,37 @@
+<head>
+	<link rel="stylesheet" href="/styles/styles.css">
+</head>
+<h1><%= title + ' Details' %></h1>
+<% if (type === 'suppliers') { %>
+  <p><strong>Name:</strong> <%= data.name %></p>
+  <p><strong>Contact Info:</strong> <%= data.contact_info %></p>
+
+<% } else if (type === 'products') { %>
+  <p><strong>Name:</strong> <%= data.name %></p>
+  <p><strong>SKU:</strong> <%= data.sku %></p>
+  <p><strong>Price:</strong> $<%= data.price %></p>
+  <p><strong>Quantity:</strong> <%= data.quantity %></p>
+  <p><strong>Supplier:</strong> <%= supplier_name == null ? 'Discontinued' : data.supplier_name %></p>
+
+<% } else if (type === 'restocks') { %>
+  <p><strong>Product Name:</strong> <%= data.product_name %></p>
+  <p><strong>Quantity:</strong> <%= data.quantity %></p>
+  <p><strong>Date:</strong> <%= data.date %></p>
+
+<% } else if (type === 'sales') { %>
+  <p><strong>Date:</strong> <%= data.date %></p>
+  <p><strong>Total Amount:</strong> $<%= data.total_amount %></p>
+<% } %>
+
+<button type="button" onclick="window.location.href='/edit?title=<%= title %>&type=<%= type %>&id=<%= data.id %>'">
+  Edit
+</button>
+<button type="button" 
+  onclick="if (confirm('<% if (type === "products") { %>Deleting this product will also delete all related restocks. Are you sure?<% } else { %>Are you sure you want to delete this item?<% } %>')) { 
+    window.location.href='/delete?title=<%= title %>&type=<%= type %>&id=<%= data.id %>'; 
+  }">
+  Delete
+</button>
+<br>
+
+<%- include('home')%>

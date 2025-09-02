@@ -1,0 +1,19 @@
+{
+	"devDependencies": {
+		"dotenv": "^17.2.1",
+		"ejs": "^3.1.10",
+		"express": "^5.1.0",
+		"node": "^22.18.0",
+		"pg": "^8.16.3",
+		"prettier": "^3.6.2"
+	},
+	"dependencies": {
+		"express-ejs-layouts": "^2.5.1",
+		"react": "^19.1.1"
+	},
+	"scripts": {
+		"start": "node --watch app.js",
+		"populatedb": "node db/populatedb.js"
+	},
+	"type": "commonjs"
+}

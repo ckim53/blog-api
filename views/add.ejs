@@ -1,0 +1,113 @@
+<head>
+	<link rel="stylesheet" href="/styles/styles.css">
+</head>
+<link rel="stylesheet" href="/styles.css">
+<h1>Add New Inventory Item</h1>
+<form id="add-form" method="POST">
+	<select name="categorySelect" id="category-select" required>
+        <option value="">-- Select Category --</option>
+		<option value="products">Products</option>
+		<option value="restocks">Restock</option>
+		<option value="sales">Sales</option>
+		<option value="suppliers">Suppliers</option>
+	</select>
+
+	<div class="form-section" id="products-fields" style="display: none">
+		<label>Name:</label>
+        <input type="text" name="name" /> 
+        
+        <label>SKU:</label>
+        <input type="text" name="sku" /> 
+        
+        <label>Price:</label>
+        <input type="number" step="0.01" name="price"/> 
+        
+        <label>Quantity:</label>
+        <input type="number" name="quantity" />
+
+        <label>Supplier:</label>
+        <select name="supplier_id" required>
+            <option value="">-- Select Supplier --</option>
+            <% suppliers.forEach(s => { %>
+            <option value="<%= s.id %>"><%= s.name %></option>
+            <% }) %>
+        </select>
+	</div>
+
+    <div class="form-section" id="restocks-fields" style="display: none">
+		<label>Product:</label>
+        <select id="product-select" name="product_id" required>
+            <option value="">-- Select Product --</option>
+            <% products.forEach(p => { %>
+            <option value="<%= p.id %>"><%= p.name %></option>
+            <% }) %>
+        </select>
+        <input type="hidden" name="product_name" id="product-name">
+        <label>Quantity:</label>
+        <input type="number" name="quantity" />
+	</div>
+
+    <div class="form-section" id="sales-fields" style="display: none">
+        <label>Total Sales Amount:</label>
+        <input type="number" step="0.01" name="total">
+	</div>
+
+    <div class="form-section" id="suppliers-fields" style="display: none">
+        <label>Name:</label>
+        <input type="text" name="name">
+
+        <label>Contact Info:</label>
+        <input type="text" name="contact">
+	</div>
+
+    <button type="submit">Add</button>
+</form>
+
+<script>
+    const form = document.getElementById('add-form');
+    const categorySelect = document.getElementById('category-select');
+    const sections = document.querySelectorAll('.form-section');
+    const productSelect = document.getElementById('product-select');
+    const productNameField = document.getElementById('product-name');
+
+    productSelect.addEventListener('change', () => {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        productNameField.value = selectedOption.text;
+    });
+  
+    const routeMap = {
+        products: '/products/add',
+        restocks: '/restocks/add',
+        sales: '/sales/add',
+        suppliers: '/suppliers/add',
+    };
+
+    function setDisabledInputs(sectionEl, disabled) {
+        sectionEl.querySelectorAll('input, select, textarea').forEach(el => {
+            el.disabled = disabled;
+        });
+    }
+
+    function showSection(selected) {
+        sections.forEach(section => {
+            const isActive = section.id === `${selected}-fields`;
+            section.style.display = isActive ? 'block' : 'none';
+            setDisabledInputs(section, !isActive);
+        });
+        form.action = routeMap[selected] || ''; 
+    }
+
+    showSection(categorySelect.value);
+
+    categorySelect.addEventListener('change', () => {
+        showSection(categorySelect.value);
+    });
+
+    form.addEventListener('submit', (e) => {
+        if (!form.action) {
+            e.preventDefault();
+            alert('Please select a category.');
+        }
+    });
+</script>
+<%- include('home')%>

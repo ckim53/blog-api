@@ -1,0 +1,99 @@
+<head>
+	<link rel="stylesheet" href="/styles/styles.css">
+</head>
+<h1>Edit Item</h1>
+<form id="edit-form" method="POST">
+    <input type="hidden" name="id" value="<%= data.id %>">
+    <input type="hidden" name="type" value="<%= type %>">
+    <input type="hidden" name="title" value="<%= title %>">
+
+	<div class="form-section" id="edit-products-fields" style="display: none">
+		<label>Name:</label>
+        <input type="text" name="name" value="<%= data.name %>" required/> 
+        
+        <label>SKU:</label>
+        <input type="text" name="sku" value="<%= data.sku %>" /> 
+        
+        <label>Price:</label>
+        <input type="number" step="0.01" name="price" value="<%= data.price %>" required/> 
+        
+        <label>Quantity:</label>
+        <input type="number" name="quantity" value="<%= data.quantity%>" required/>
+
+        <label>Supplier:</label>
+        <select name="supplier_id" required>
+        <% suppliers.forEach(s => { %>
+            <option value="<%= s.id %>" <%= s.id === data.supplier_id ? 'selected' : '' %>>
+                <%= s.name %>
+            </option>
+        <% }) %>
+        </select>
+	</div>
+
+    <div class="form-section" id="edit-restocks-fields" style="display: none">
+		<label>Product:</label>
+        <select id="product-select" name="product_id" required>
+            <option value="">-- Select Product --</option>
+            <% products.forEach(p => { %>
+                <option value="<%= p.id %>" <%= p.id === data.product_id ? 'selected' : '' %>>
+                    <%= p.name %>
+                </option>
+            <% }) %>
+        </select>
+        <input type="hidden" name="product_name" id="product-name">
+        <label>Quantity:</label>
+        <input type="number" name="quantity" value="<%= data.quantity %>" required/>
+	</div>
+
+    <div class="form-section" id="edit-sales-fields" style="display: none">
+        <label>Total Sales Amount:</label>
+        <input type="number" step="0.01" name="total" value="<%= data.total_amount %>" required>
+	</div>
+
+    <div class="form-section" id="edit-suppliers-fields" style="display: none">
+        <label>Name:</label>
+        <input type="text" name="name" value="<%= data.name %>" required>
+
+        <label>Contact Info:</label>
+        <input type="text" name="contact" value="<%= data.contact_info %>" required>
+	</div>
+    <button type="submit">Save Changes</button>
+</form>
+
+<script>
+    const type = '<%= type %>';
+    const form = document.getElementById('edit-form');
+    const sections = document.querySelectorAll('.form-section');
+    const productSelect = document.getElementById('product-select');
+    const productNameField = document.getElementById('product-name');
+
+    productSelect.addEventListener('change', () => {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        productNameField.value = selectedOption.text;
+    });
+  
+    const routeMap = {
+        products: '/products/edit',
+        restocks: '/restocks/edit',
+        sales: '/sales/edit',
+        suppliers: '/suppliers/edit',
+    };
+
+    function setDisabledInputs(sectionEl, disabled) {
+        sectionEl.querySelectorAll('input, select, textarea').forEach(el => {
+            el.disabled = disabled;
+        });
+    }
+
+    function showSection(selected) {
+        sections.forEach(section => {
+            const isActive = section.id === `edit-${selected}-fields`;
+            section.style.display = isActive ? 'block' : 'none';
+            setDisabledInputs(section, !isActive);
+        });
+        form.action = routeMap[selected] || ''; 
+    }
+    showSection(type);
+</script>
+
+<%- include('home')%>
