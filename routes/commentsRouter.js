@@ -1,10 +1,11 @@
 const express = require('express');
 const commentsRouter = express.Router({ mergeParams: true });
 const commentsController = require('../controllers/commentsController');
+const { requireAuth } = require('../config/passport');
 
 commentsRouter.get('/', commentsController.showComments);
-commentsRouter.post('/', commentsController.createComment);
-commentsRouter.put('/:id', commentsController.editComment);
-commentsRouter.delete('/:id', commentsController.deleteComment);
+commentsRouter.post('/', requireAuth, commentsController.createComment);
+commentsRouter.put('/:id', requireAuth, commentsController.editComment);
+commentsRouter.delete('/:id', requireAuth, commentsController.deleteComment);
 
 module.exports = commentsRouter;

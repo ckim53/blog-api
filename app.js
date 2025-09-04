@@ -1,8 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const flash = require('connect-flash');
+const jwt = require('jsonwebtoken');
 const methodOverride = require('method-override');
-const sessionMiddleware = require('./config/session');
 const passport = require('./config/passport');
 const prisma = require('./config/prisma');
 
@@ -14,11 +13,9 @@ const commentsRouter = require('./routes/commentsRouter');
 const app = express();
 app.use(flash());
 
-app.use(sessionMiddleware);
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(passport.initialize());
-app.use(passport.session());
 app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
 	next();
@@ -32,19 +29,14 @@ app.use((req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
-	res.render('index');
+	res.json({ ok: true, message: 'Welcome to the API' });
 });
 
 app.get('/sign-up', (req, res) => {
-	const errors = req.session.formErrors || null;
-	const data = req.session.formData || {};
-
-	req.session.formErrors = null;
-	req.session.formData = null;
-	const errorMessages = errors
-		? Object.values(errors).map((err) => err.msg)
-		: [];
-	res.render('sign-up', { errorMessages, data });
+	res.json({
+		ok: true,
+		message: 'Sign-up endpoint',
+	});
 });
 
 app.post(
@@ -77,9 +69,7 @@ app.post(
 	async (req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			req.session.formErrors = errors.mapped();
-			req.session.formData = req.body;
-			return res.redirect(303, '/sign-up');
+			return res.status(400).json({ ok: false, errors: errors.mapped() });
 		}
 		try {
 			const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -89,7 +79,9 @@ app.post(
 					password: hashedPassword,
 				},
 			});
-			res.render('log-in');
+			res
+				.status(201)
+				.json({ ok: true, data: { id: user.id, username: user.username } });
 		} catch (err) {
 			return next(err);
 		}
@@ -100,27 +92,33 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/log-in', (req, res) => {
-	res.render('log-in');
+	res.json({
+		ok: true,
+		message: 'Log-in endpoint',
+	});
 });
 
-app.post(
-	'/log-in',
-	passport.authenticate('local', {
-		successRedirect: 'dashboard',
-		failureRedirect: '/log-in',
-		failureFlash: true,
-	}),
-);
+app.post('/log-in', (req, res, next) => {
+	passport.authenticate('local', { session: false }, (err, user, info) => {
+		if (err || !user)
+			return res.status(401).json({ ok: false, error: 'Invalid credentials' });
+
+		const token = jwt.sign(
+			{ id: user.id, username: user.username },
+			process.env.JWT_SECRET,
+			{
+				expiresIn: '1h',
+			},
+		);
+		res.json({ ok: true, token });
+	})(req, res, next);
+});
 
 app.use('/posts', postsRouter);
 app.use('/posts/:postId/comments', commentsRouter);
 
 app.post('/logout', (req, res) => {
-	req.logout(() => {
-		req.session.destroy(() => {
-			res.redirect('/log-in');
-		});
-	});
+	res.json({ ok: true, message: 'Client should delete token to log out' });
 });
 
 app.listen(3000, () => console.log('app listening on port 3000!'));

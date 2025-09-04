@@ -26,10 +26,26 @@ const deleteComment = async (req, res) => {
 		const { id } = req.params;
 		const commentId = Number(id);
 
+		const comment = await prisma.comment.findUnique({
+			where: { id: commentId },
+			include: { post: true },
+		});
+
+		if (!comment) {
+			return res.status(404).json({ ok: false, error: 'Comment not found' });
+		}
+
+		if (
+			comment.authorId !== req.user.id &&
+			comment.post.authorId !== req.user.id
+		) {
+			return res.status(403).json({ ok: false, error: 'Not authorized' });
+		}
+
 		await prisma.comment.delete({ where: { id: commentId } });
 		res.sendStatus(204);
 	} catch (err) {
-		res.status(404).json({ ok: false, error: 'Comment not found' });
+		res.status(500).json({ ok: false, error: 'Failed to delete comment' });
 	}
 };
 
@@ -38,13 +54,26 @@ const editComment = async (req, res) => {
 		const { id } = req.params;
 		const commentId = Number(id);
 
+		const comment = await prisma.comment.findUnique({
+			where: { id: commentId },
+		});
+
+		if (!comment) {
+			return res.status(404).json({ ok: false, error: 'Comment not found' });
+		}
+
+		if (comment.authorId !== req.user.id) {
+			return res.status(403).json({ ok: false, error: 'Not authorized' });
+		}
+
 		const updatedComment = await prisma.comment.update({
 			where: { id: commentId },
 			data: req.body,
 		});
+
 		res.json({ ok: true, data: updatedComment });
 	} catch (err) {
-		res.status(404).json({ ok: false, error: 'Comment not found' });
+		res.status(500).json({ ok: false, error: 'Failed to update comment' });
 	}
 };
 
