@@ -1,4 +1,4 @@
-const { prisma } = require('../config/prisma');
+const prisma = require('../config/prisma');
 
 const createPost = async (req, res) => {
 	try {
@@ -49,12 +49,13 @@ const editPost = async (req, res) => {
 
 const showAllPosts = async (req, res) => {
 	try {
-		const posts = await prisma.findMany({
+		const posts = await prisma.post.findMany({
 			where: { published: true },
 			include: { author: true, comments: true },
 		});
 		res.json({ ok: true, data: posts });
-	} catch {
+	} catch (err) {
+		console.error(err);
 		res.status(500).json({ ok: false, error: 'Failed to fetch posts' });
 	}
 };

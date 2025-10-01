@@ -2,6 +2,7 @@
 	"dependencies": {
 		"@quixo3/prisma-session-store": "^3.1.13",
 		"bcryptjs": "^3.0.2",
+		"cors": "^2.8.5",
 		"dotenv": "^17.2.2",
 		"express": "^5.1.0",
 		"express-validator": "^7.2.1",
@@ -18,8 +19,7 @@
 		"prettier": "^3.6.2"
 	},
 	"scripts": {
-		"start": "node --watch app.js",
-		"populatedb": "node db/populatedb.js"
+		"start": "node --watch app.js"
 	},
 	"type": "commonjs"
 }

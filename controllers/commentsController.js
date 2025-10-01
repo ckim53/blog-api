@@ -1,23 +1,28 @@
-const { prisma } = require('../config/prisma');
+const prisma = require('../config/prisma');
 
 const createComment = async (req, res) => {
 	try {
-		const { content, postId, authorId } = req.body;
-		if (!content || !postId || !authorId) {
+		const { content } = req.body;
+		const postId = req.params.postId;
+
+		if (!content || !postId) {
 			return res.status(400).json({
 				ok: false,
-				error: 'content, postId, and authorId are required',
+				error: 'content and postId are required',
 			});
 		}
 
 		const newComment = await prisma.comment.create({
-			data: { content, postId, authorId },
+			data: { content, postId: Number(postId), authorId: req.user.id },
 			include: { author: true, post: true },
 		});
 
 		res.status(201).json({ ok: true, data: newComment });
 	} catch (err) {
-		res.status(500).json({ ok: false, error: 'Failed to create comment' });
+		console.error('Error creating comment:', err);
+		res
+			.status(500)
+			.json({ ok: false, error: err.message || 'Failed to create comment' });
 	}
 };
 
@@ -79,16 +84,16 @@ const editComment = async (req, res) => {
 
 const showComments = async (req, res) => {
 	try {
-		const { id } = req.params;
-		const postId = Number(id);
+		const { postId } = req.params;
+		const id = Number(postId);
 
 		const comments = await prisma.comment.findMany({
-			where: { postId },
+			where: { postId: id },
 			include: { author: true },
 		});
 		res.json({ ok: true, data: comments });
 	} catch (err) {
-		res.status(500).json({ ok: false, error: 'Failed to fetch comments' });
+		res.status(500).json({ ok: false, error: err.message });
 	}
 };
 
