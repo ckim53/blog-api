@@ -8,8 +8,7 @@ const cors = require('cors');
 
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const postsRouter = require('./routes/postsRouter');
-const commentsRouter = require('./routes/commentsRouter');
+const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
@@ -119,8 +118,8 @@ app.post('/log-in', (req, res, next) => {
 	})(req, res, next);
 });
 
-app.use('/posts', postsRouter);
-app.use('/posts/:postId/comments', commentsRouter);
+app.use('/posts', publicPostsRouter);
+app.use('/admin/:authorId/posts', adminPostsRouter);
 
 app.post('/logout', (req, res) => {
 	res.json({ ok: true, message: 'Client should delete token to log out' });
@@ -132,4 +131,5 @@ app.use((err, req, res, next) => {
 		.status(500)
 		.json({ ok: false, error: err.message || 'Internal Server Error' });
 });
+
 app.listen(3000, () => console.log('app listening on port 3000!'));

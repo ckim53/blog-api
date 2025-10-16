@@ -21,6 +21,7 @@ passport.use(
 		}
 	}),
 );
+
 passport.use(
 	new JwtStrategy(
 		{

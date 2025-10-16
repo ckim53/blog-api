@@ -60,6 +60,20 @@ const showAllPosts = async (req, res) => {
 	}
 };
 
+const showAllPostsFromAuthor = async (req, res) => {
+	try {
+		const authorId = Number(req.params.authorId);
+		const posts = await prisma.post.findMany({
+			where: { authorId },
+			include: { author: true, comments: true },
+		});
+		res.json({ ok: true, data: posts });
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ ok: false, error: 'Failed to fetch posts' });
+	}
+};
+
 const showPostDetails = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -84,5 +98,6 @@ module.exports = {
 	deletePost,
 	editPost,
 	showAllPosts,
+	showAllPostsFromAuthor,
 	showPostDetails,
 };

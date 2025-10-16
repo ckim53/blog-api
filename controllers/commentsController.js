@@ -72,7 +72,6 @@ const editComment = async (req, res) => {
 		}
 
 		const updatedComment = await prisma.comment.update({
-			where: { id: commentId },
 			data: req.body,
 		});
 
