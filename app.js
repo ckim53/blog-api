@@ -118,8 +118,8 @@ app.post('/log-in', (req, res, next) => {
 	})(req, res, next);
 });
 
-app.use('/posts', publicPostsRouter);
 app.use('/admin/:authorId/posts', adminPostsRouter);
+app.use('/posts', publicPostsRouter);
 
 app.post('/logout', (req, res) => {
 	res.json({ ok: true, message: 'Client should delete token to log out' });

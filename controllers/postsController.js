@@ -9,7 +9,12 @@ const createPost = async (req, res) => {
 				.json({ ok: false, error: 'Title and content are required' });
 		}
 		const newPost = await prisma.post.create({
-			data: { title, content, published, authorId: req.body.authorId },
+			data: {
+				title,
+				content,
+				published,
+				authorId: Number(req.params.authorId),
+			},
 		});
 		res.status(201).json({ ok: true, data: newPost });
 	} catch (err) {
@@ -31,19 +36,25 @@ const deletePost = async (req, res) => {
 
 const editPost = async (req, res) => {
 	try {
-		const { id } = req.params;
+		const { id, authorId } = req.params;
 		const postId = Number(id);
+		const post = await prisma.post.findFirst({
+			where: { id: postId, authorId: Number(authorId) },
+		});
 
+		if (!post) {
+			return res.status(404).json({ ok: false, error: 'Post not found' });
+		}
 		const updatedPost = await prisma.post.update({
 			where: {
 				id: postId,
 			},
 			data: req.body,
 		});
-
 		res.json({ ok: true, data: updatedPost });
 	} catch (err) {
-		res.status(404).json({ ok: false, error: 'Post not found' });
+		console.log(err);
+		res.status(500).json({ ok: false, error: 'Server Error' });
 	}
 };
 
