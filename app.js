@@ -11,7 +11,7 @@ const bcrypt = require('bcryptjs');
 const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(passport.initialize());
@@ -132,4 +132,4 @@ app.use((err, req, res, next) => {
 		.json({ ok: false, error: err.message || 'Internal Server Error' });
 });
 
-app.listen(3000, () => console.log('app listening on port 3000!'));
+app.listen(process.env.PORT);
