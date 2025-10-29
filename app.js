@@ -17,11 +17,7 @@ app.use(
 		credentials: true,
 	}),
 );
-console.log(
-	'Allowed origins:',
-	process.env.CLIENT_ORIGIN,
-	process.env.ADMIN_ORIGIN,
-);
+
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(passport.initialize());
