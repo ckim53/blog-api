@@ -11,7 +11,12 @@ const bcrypt = require('bcryptjs');
 const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));
+app.use(
+	cors({
+		origin: [process.env.CLIENT_ORIGIN, process.env.ADMIN_ORIGIN],
+		credentials: true,
+	}),
+);
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(passport.initialize());
