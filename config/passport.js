@@ -7,13 +7,18 @@ const bcrypt = require('bcryptjs');
 const requireAuth = passport.authenticate('jwt', { session: false });
 
 passport.use(
-	new LocalStrategy(async (username, password, done) => {
+	new LocalStrategy(async (username, password, guest, done) => {
 		try {
-			const user = await prisma.user.findUnique({ where: { username } });
+			const user = guest
+				? await prisma.user.findUnique({ where: { username: 'guest' } })
+				: await prisma.user.findUnique({ where: { username } });
+
 			if (!user) return done(null, false, { message: 'User not found' });
 
-			const match = await bcrypt.compare(password, user.password);
-			if (!match) return done(null, false, { message: 'Incorrect password' });
+			if (!guest) {
+				const match = await bcrypt.compare(password, user.password);
+				if (!match) return done(null, false, { message: 'Incorrect password' });
+			}
 
 			return done(null, user);
 		} catch (err) {
