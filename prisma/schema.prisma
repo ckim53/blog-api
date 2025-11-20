@@ -25,6 +25,8 @@ model Post {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
   comments  Comment[]
+  isProtected Boolean @default(false) 
+  seedId String? @unique
 }
 
 model Comment {

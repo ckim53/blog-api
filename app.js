@@ -69,16 +69,23 @@ app.post(
 			return res.status(400).json({ ok: false, errors: errors.mapped() });
 		}
 		try {
+			const { username, displayName } = req.body;
 			const hashedPassword = await bcrypt.hash(req.body.password, 10);
 			const user = await prisma.user.create({
 				data: {
-					username: req.body.username,
+					username,
 					password: hashedPassword,
+					displayName: displayName?.trim() || username,
 				},
 			});
-			res
-				.status(201)
-				.json({ ok: true, data: { id: user.id, username: user.username } });
+			res.status(201).json({
+				ok: true,
+				data: {
+					id: user.id,
+					username: user.username,
+					displayName: user.displayName,
+				},
+			});
 		} catch (err) {
 			return next(err);
 		}

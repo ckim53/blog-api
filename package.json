@@ -21,5 +21,8 @@
 	"scripts": {
 		"start": "node --watch app.js"
 	},
-	"type": "commonjs"
+	"type": "commonjs",
+	"prisma": {
+		"seed": "node prisma/seed.js"
+	}
 }

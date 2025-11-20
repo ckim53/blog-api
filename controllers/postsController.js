@@ -27,6 +27,10 @@ const deletePost = async (req, res) => {
 		const { id } = req.params;
 		const postId = Number(id);
 
+		if (post.isProtected) {
+			return res.status(403).json({ message: 'This post cannot be deleted.' });
+		}
+
 		await prisma.post.delete({ where: { id: postId } });
 		res.sendStatus(204);
 	} catch (err) {
