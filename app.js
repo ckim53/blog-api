@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 const passport = require('passport');
 const prisma = require('./config/prisma');
 const cors = require('cors');
+const path = require('path');
 
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -18,6 +19,7 @@ app.use(
 	}),
 );
 app.use(express.json());
+
 app.use(methodOverride('_method'));
 app.use(passport.initialize());
 app.use((req, res, next) => {
