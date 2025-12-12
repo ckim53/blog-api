@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
@@ -6,12 +7,15 @@ async function main() {
 
 	await prisma.post.deleteMany({});
 
+	const hashedAdminPassword = await bcrypt.hash('donut', 10);
+	const hashedGuestPassword = await bcrypt.hash('password562d3mo', 10);
+
 	const user = await prisma.user.upsert({
 		where: { username: 'cwistina' },
 		update: {},
 		create: {
 			username: 'cwistina',
-			password: 'donut',
+			password: hashedAdminPassword,
 			displayName: 'Christina K.',
 		},
 	});
@@ -21,7 +25,7 @@ async function main() {
 		update: {},
 		create: {
 			username: 'guest',
-			password: 'password562d3mo',
+			password: hashedGuestPassword,
 			displayName: 'Guest User',
 		},
 	});
@@ -48,57 +52,60 @@ async function main() {
 
 	const posts = [
 		{
+			seedId: 'morning-routine',
 			title: 'A Quiet Morning Routine',
 			content:
-				'I’ve been keeping mornings simple—coffee, a short walk, and a few minutes to think before opening my laptop. I didn’t realize how much of a difference a slow start makes until I tried it consistently.',
+				'I’ve been keeping mornings simple—coffee, a short walk, and a few minutes to think before opening my laptop...',
 			published: true,
 		},
 		{
+			seedId: 'coffee-shop-notes',
 			title: 'Notes From an Afternoon at a Coffee Shop',
-			content:
-				'I spent a couple hours working from a small café today. There’s something about the mix of background noise and the smell of coffee that makes it easier to focus. It felt good to step away from the house for a bit.',
+			content: 'I spent a couple hours working from a small café today...',
 			published: true,
 		},
 		{
+			seedId: 'better-habits',
 			title: 'Trying to Build Better Habits',
-			content:
-				'Lately I’ve been thinking about habits I want to improve—less phone time in the morning, more reading at night, and cooking at home more often. Small changes feel less overwhelming when I focus on one at a time.',
+			content: 'Lately I’ve been thinking about habits I want to improve...',
 			published: true,
 		},
 		{
+			seedId: 'day-off',
 			title: 'What I Learned by Taking a Day Off',
-			content:
-				'I took a day completely off last week. I didn’t do anything remarkable—I ran a few errands, cleaned, grabbed lunch, and rested. But resetting like that made the next few days feel noticeably easier.',
+			content: 'I took a day completely off last week...',
 			published: true,
 		},
 		{
+			seedId: 'consistency',
 			title: 'Thoughts on Consistency',
 			content:
-				'Consistency isn’t exciting, but it’s the thing that actually produces results. I’m trying to rely less on motivation and more on routine—even a simple checklist has helped me stay on track.',
+				'Consistency isn’t exciting, but it’s the thing that actually produces results...',
 			published: true,
 		},
 		{
+			seedId: 'familiar-places',
 			title: 'The Comfort of Familiar Places',
-			content:
-				'There’s a small coffee shop I keep going back to. Not because it’s the best, but because it’s familiar—same lighting, same quiet corner, same rhythm. It’s become a dependable part of my week.',
+			content: 'There’s a small coffee shop I keep going back to...',
 			published: true,
 		},
 		{
+			seedId: 'resetting-space',
 			title: 'Resetting My Space',
-			content:
-				'I cleaned my desk today and reorganized a few things. It only took ten minutes, but it immediately made my workspace feel lighter. Physical clutter really does translate into mental clutter.',
+			content: 'I cleaned my desk today and reorganized a few things...',
 			published: true,
 		},
 		{
+			seedId: 'midweek-reflections',
 			title: 'Midweek Reflections',
-			content:
-				'This week hasn’t been perfect, but it’s been okay—and sometimes that’s enough. I’m learning to celebrate the days that are simply steady, not extraordinary.',
+			content: 'This week hasn’t been perfect, but it’s been okay...',
 			published: true,
 		},
 		{
+			seedId: 'small-wins',
 			title: 'Small Wins That Made My Week',
 			content:
-				'Cooked at home twice, finally finished a book I started months ago, and caught up with an old friend over coffee. Nothing major, but a bunch of small wins add up.',
+				'Cooked at home twice, finally finished a book I started months ago...',
 			published: true,
 		},
 	];
@@ -106,7 +113,7 @@ async function main() {
 	for (const post of posts) {
 		await prisma.post.upsert({
 			where: {
-				seedId: post.title,
+				seedId: post.seedId,
 			},
 			update: {
 				content: post.content,

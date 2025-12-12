@@ -111,37 +111,53 @@ app.get('/demo', (req, res) => {
 
 app.post('/demo', async (req, res, next) => {
 	const { guest } = req.body;
-	let user = null;
-	if (guest) {
-		user = await prisma.user.findUnique({ where: { username: 'guest' } });
-	} else {
-		passport.authenticate('local', { session: false }, (err, user, info) => {
-			if (err) {
-				console.error(err);
-				return res
-					.status(500)
-					.json({ ok: false, error: 'Server error. Please try again.' });
-			}
 
-			if (!user) {
-				return res
-					.status(401)
-					.json({ ok: false, error: info?.message || 'Invalid credentials' });
-			}
-		})(req, res, next);
+	if (guest) {
+		const user = await prisma.user.findUnique({
+			where: { username: 'guest' },
+		});
+
+		if (!user) {
+			return res.status(401).json({ ok: false, error: 'Guest user not found' });
+		}
+
+		const token = jwt.sign(
+			{ id: user.id, username: user.username },
+			process.env.JWT_SECRET,
+			{ expiresIn: '1h' },
+		);
+
+		return res.json({
+			ok: true,
+			user: { id: user.id, username: user.username },
+			token,
+		});
 	}
 
-	const token = jwt.sign(
-		{ id: user.id, username: user.username },
-		process.env.JWT_SECRET,
-		{ expiresIn: '1h' },
-	);
+	passport.authenticate('local', { session: false }, (err, user, info) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).json({ ok: false, error: 'Server error' });
+		}
 
-	res.json({
-		ok: true,
-		user: { id: user.id, username: user.username },
-		token,
-	});
+		if (!user) {
+			return res
+				.status(401)
+				.json({ ok: false, error: info?.message || 'Invalid credentials' });
+		}
+
+		const token = jwt.sign(
+			{ id: user.id, username: user.username },
+			process.env.JWT_SECRET,
+			{ expiresIn: '1h' },
+		);
+
+		return res.json({
+			ok: true,
+			user: { id: user.id, username: user.username },
+			token,
+		});
+	})(req, res, next);
 });
 
 app.post('/log-in', (req, res, next) => {

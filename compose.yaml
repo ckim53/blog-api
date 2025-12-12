@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  blog-client:
+    build:
+      context: ../blog-client
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+
+  blog-admin:
+    build:
+      context: ../blog-admin
+    ports:
+      - '5174:80'
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
