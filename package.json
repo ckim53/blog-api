@@ -20,7 +20,8 @@
 		"prettier": "^3.6.2"
 	},
 	"scripts": {
-		"start": "npx prisma migrate deploy && npx prisma db seed && node --watch app.js"
+		"dev": "npx prisma migrate deploy && npx prisma db seed && node --watch app.js",
+		"start": "npx prisma migrate deploy && node app.js"
 	},
 	"type": "commonjs",
 	"prisma": {
