@@ -203,4 +203,6 @@ app.use((err, req, res, next) => {
 		.json({ ok: false, error: err.message || 'Internal Server Error' });
 });
 
-app.listen(process.env.PORT);
+const port = process.env.PORT || 3000;
+
+app.listen(port);
