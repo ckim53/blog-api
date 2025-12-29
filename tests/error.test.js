@@ -1,3 +1,11 @@
+beforeAll(() => {
+	jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+	console.error.mockRestore();
+});
+
 jest.mock('../config/passport', () => ({
 	passport: {
 		initialize: () => (req, _res, next) => next(),

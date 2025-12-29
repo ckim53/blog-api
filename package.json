@@ -29,5 +29,10 @@
 	"type": "commonjs",
 	"prisma": {
 		"seed": "node prisma/seed.js"
+	},
+	"jest": {
+		"setupFiles": [
+			"<rootDir>/jest.setup.js"
+		]
 	}
 }
