@@ -78,6 +78,9 @@ const showAllPosts = async (req, res) => {
 const showAllPostsFromAuthor = async (req, res) => {
 	try {
 		const authorId = Number(req.params.authorId);
+		if (req.user.id !== authorId) {
+			return res.status(403).json({ ok: false, error: 'Forbidden' });
+		}
 		const posts = await prisma.post.findMany({
 			where: { authorId },
 			include: { author: true, comments: true },

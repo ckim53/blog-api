@@ -12,6 +12,9 @@ const bcrypt = require('bcryptjs');
 const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
+app.get('/health', (_req, res) => {
+	res.status(200).send('ok');
+});
 app.use(
 	cors({
 		origin: [process.env.CLIENT_ORIGIN, process.env.ADMIN_ORIGIN],
@@ -204,6 +207,10 @@ app.use((err, req, res, next) => {
 		.json({ ok: false, error: err.message || 'Internal Server Error' });
 });
 
-const port = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== 'test') {
+	app.listen(PORT, () => {
+		console.log(`Server running on port ${PORT}`);
+	});
+}
 
-app.listen(port);
+module.exports = app;
