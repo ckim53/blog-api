@@ -19,7 +19,7 @@ app.use(
 		credentials: true,
 	}),
 );
-app.options('*', cors());
+
 app.use(express.json());
 
 app.use(methodOverride('_method'));
@@ -97,8 +97,6 @@ app.post(
 		}
 	},
 );
-
-app.use(passport.initialize());
 
 app.get('/log-in', (req, res) => {
 	res.json({
@@ -206,6 +204,8 @@ app.use((err, req, res, next) => {
 		.status(500)
 		.json({ ok: false, error: err.message || 'Internal Server Error' });
 });
+
+const PORT = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV !== 'test') {
 	app.listen(PORT, () => {
