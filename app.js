@@ -12,9 +12,7 @@ const bcrypt = require('bcryptjs');
 const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
-app.get('/health', (_req, res) => {
-	res.status(200).send('ok');
-});
+
 app.use(
 	cors({
 		origin: [process.env.CLIENT_ORIGIN, process.env.ADMIN_ORIGIN],
@@ -30,7 +28,9 @@ app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
 	next();
 });
-
+app.get('/health', (_req, res) => {
+	res.status(200).send('ok');
+});
 app.get('/', async (req, res) => {
 	res.json({ ok: true, message: 'Welcome to the API' });
 });
