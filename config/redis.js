@@ -1,7 +1,16 @@
 const { createClient } = require('redis');
 
+if (process.env.NODE_ENV === 'test') {
+	module.exports = {
+		get: async () => null,
+		set: async () => null,
+		del: async () => null,
+	};
+	return;
+}
+
 const redisClient = createClient({
-	url: process.env.REDIS_URL,
+	url: process.env.REDIS_URL || 'redis://localhost:6379',
 });
 
 redisClient.on('error', (err) => {
