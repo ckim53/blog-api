@@ -16,7 +16,12 @@ if (process.env.NODE_ENV === 'test') {
 	});
 
 	(async () => {
-		await redisClient.connect();
+		try {
+			await redisClient.connect();
+			console.log('Redis connected');
+		} catch (err) {
+			console.warn('Redis unavailable, continuing without cache');
+		}
 	})();
 
 	module.exports = redisClient;
