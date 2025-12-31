@@ -13,12 +13,11 @@ const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
 
-const corsOptions = {
-	origin: [process.env.CLIENT_ORIGIN, process.env.ADMIN_ORIGIN],
-	optionsSuccessStatus: 200,
-	credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(
+	cors({
+		origin: [process.env.CLIENT_ORIGIN, process.env.ADMIN_ORIGIN],
+	}),
+);
 
 app.options('*', cors(corsOptions));
 
