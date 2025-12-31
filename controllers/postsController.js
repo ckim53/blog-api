@@ -1,7 +1,11 @@
 const prisma = require('../config/prisma');
+const redis = require('../config/redis');
+
+const CACHE_KEY = 'public_posts';
 
 const createPost = async (req, res) => {
 	try {
+		await redis.del('public_posts');
 		const { title, content, published } = req.body;
 		if (!title || !content) {
 			return res
@@ -24,6 +28,7 @@ const createPost = async (req, res) => {
 
 const deletePost = async (req, res) => {
 	try {
+		await redis.del('public_posts');
 		const { id } = req.params;
 		const postId = Number(id);
 
@@ -40,6 +45,7 @@ const deletePost = async (req, res) => {
 
 const editPost = async (req, res) => {
 	try {
+		await redis.del('public_posts');
 		const { id, authorId } = req.params;
 		const postId = Number(id);
 		const post = await prisma.post.findFirst({
@@ -64,11 +70,25 @@ const editPost = async (req, res) => {
 
 const showAllPosts = async (req, res) => {
 	try {
+		const cached = await redis.get(CACHE_KEY);
+		if (cached) {
+			return res.json({
+				ok: true,
+				data: JSON.parse(cached),
+				cached: true,
+			});
+		}
+
 		const posts = await prisma.post.findMany({
 			where: { published: true },
 			include: { author: true, comments: true },
 		});
-		res.json({ ok: true, data: posts });
+
+		await redis.set(CACHE_KEY, JSON.stringify(posts), {
+			EX: 60,
+		});
+
+		res.json({ ok: true, data: posts, cached: false });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ ok: false, error: 'Failed to fetch posts' });
