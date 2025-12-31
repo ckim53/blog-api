@@ -16,10 +16,10 @@ const app = express();
 app.use(
 	cors({
 		origin: [process.env.CLIENT_ORIGIN, process.env.ADMIN_ORIGIN],
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization'],
 	}),
 );
-
-app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
