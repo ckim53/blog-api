@@ -29,8 +29,15 @@ const createPost = async (req, res) => {
 const deletePost = async (req, res) => {
 	try {
 		await redis.del('public_posts');
-		const { id } = req.params;
+		const { id, authorId } = req.params;
 		const postId = Number(id);
+
+		const post = await prisma.post.findFirst({
+			where: {
+				id: postId,
+				authorId: Number(authorId),
+			},
+		});
 
 		if (post.isProtected) {
 			return res.status(403).json({ message: 'This post cannot be deleted.' });
