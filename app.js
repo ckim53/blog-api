@@ -12,6 +12,7 @@ const bcrypt = require('bcryptjs');
 const { adminPostsRouter, publicPostsRouter } = require('./routes/postsRouter');
 
 const app = express();
+console.log('BOOTING BACKEND WITH CORS FIX');
 
 app.use(
 	cors({
