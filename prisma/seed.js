@@ -5,9 +5,6 @@ const prisma = new PrismaClient();
 async function main() {
 	console.log('seeding database...');
 
-	await prisma.comment.deleteMany({});
-	await prisma.post.deleteMany({});
-
 	const hashedAdminPassword = await bcrypt.hash('donut', 10);
 	const hashedGuestPassword = await bcrypt.hash('password562d3mo', 10);
 
