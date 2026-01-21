@@ -27,6 +27,10 @@ model Post {
   comments  Comment[]
   isProtected Boolean @default(false) 
   seedId String? @unique
+
+  @@index([authorId])
+  @@index([published])
+  @@index([authorId, createdAt])
 }
 
 model Comment {
@@ -37,6 +41,9 @@ model Comment {
   postId    Int
   author    User @relation(fields: [authorId], references: [id])
   authorId  Int
+
+  @@index([postId])
+  @@index([authorId])
 }
 
 model Session {
