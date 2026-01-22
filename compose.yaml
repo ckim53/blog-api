@@ -19,6 +19,8 @@ services:
           path: package.json
     environment:
       REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/app
 
   blog-client:
     build:
@@ -60,6 +62,7 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
     ports:
       - '5432:5432'
 
