@@ -30,8 +30,8 @@ const deletePost = async (req, res) => {
 	try {
 		try {
 			await redis.del('public_posts');
-		} catch (redisErr) {
-			console.error('Redis error during delete:', redisErr);
+		} catch (e) {
+			console.warn('Redis failed to clear cache, proceeding with DB delete');
 		}
 		const { id, authorId } = req.params;
 		const postId = Number(id);
@@ -59,7 +59,7 @@ const deletePost = async (req, res) => {
 		console.error('DEBUG: deletePost failed with:', {
 			message: err.message,
 			stack: err.stack,
-			params: req.params
+			params: req.params,
 		});
 		res.status(500).json({ error: err.message });
 	}
