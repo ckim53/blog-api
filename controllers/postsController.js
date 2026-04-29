@@ -53,10 +53,6 @@ const deletePost = async (req, res) => {
 			return res.status(403).json({ message: 'This post cannot be deleted.' });
 		}
 
-		await prisma.comment.deleteMany({
-			where: { postId: postId },
-		});
-
 		await prisma.post.delete({ where: { id: postId } });
 		res.sendStatus(204);
 	} catch (err) {
