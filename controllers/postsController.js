@@ -28,7 +28,11 @@ const createPost = async (req, res) => {
 
 const deletePost = async (req, res) => {
 	try {
-		await redis.del('public_posts');
+		try {
+			await redis.del('public_posts');
+		} catch (redisErr) {
+			console.error('Redis error during delete:', redisErr);
+		}
 		const { id, authorId } = req.params;
 		const postId = Number(id);
 
@@ -39,6 +43,12 @@ const deletePost = async (req, res) => {
 			},
 		});
 
+		if (!post) {
+			return res
+				.status(404)
+				.json({ ok: false, error: 'Post not found in database' });
+		}
+
 		if (post.isProtected) {
 			return res.status(403).json({ message: 'This post cannot be deleted.' });
 		}
@@ -46,7 +56,12 @@ const deletePost = async (req, res) => {
 		await prisma.post.delete({ where: { id: postId } });
 		res.sendStatus(204);
 	} catch (err) {
-		res.status(404).json({ ok: false, error: 'Post not found' });
+		console.error('DEBUG: deletePost failed with:', {
+			message: err.message,
+			stack: err.stack,
+			params: req.params
+		});
+		res.status(500).json({ error: err.message });
 	}
 };
 
